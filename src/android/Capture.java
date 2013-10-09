@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 
 import android.os.Build;
 
@@ -240,6 +241,16 @@ public class Capture extends CordovaPlugin {
 
         if(Build.VERSION.SDK_INT > 7){
             intent.putExtra("android.intent.extra.durationLimit", duration);
+        }
+        if(Build.VERSION.SDK_INT >= 18){
+            SimpleDateFormat formatter=  new SimpleDateFormat("_yyyyMMdd_kkmmss");
+            ContentValues value = new ContentValues();
+            value.put(android.provider.MediaStore.Video.Media.TITLE, "VID"+formatter.format(new java.util.Date()));
+            value.put(android.provider.MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+            value.put(android.provider.MediaStore.Video.Media.DATA, "/DCIM/Camera/");
+
+            Uri videoUri = this.cordova.getContext().getContentResolver().insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, value);
+            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, value);
         }
         this.cordova.startActivityForResult((CordovaPlugin) this, intent, CAPTURE_VIDEO);
     }
